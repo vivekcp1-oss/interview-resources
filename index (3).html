@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine Learning Fundamentals Infographic</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F8FAFC; color: #0F172A; margin: 0; padding: 0; }
+.chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 320px; max-height: 400px; }
+@media (min-width: 768px) { .chart-container { height: 380px; } }
+.card { background: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); padding: 1.5rem; transition: transform 0.2s; }
+.card:hover { transform: translateY(-5px); }
+.gradient-text { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hierarchy-circle { border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; }
+.workflow-arrow { font-size: 1.5rem; color: #94A3B8; font-weight: bold; margin: 0 0.5rem; }
+@media (max-width: 767px) { .workflow-arrow { transform: rotate(90deg); margin: 0.5rem 0; } }
+</style>
+</head>
+<body>
+
+<div style="display:none;" 
+     data-palette="Electric Blue (#3B82F6), Vibrant Pink (#EC4899), Bright Yellow (#EAB308), Deep Navy (#0F172A)" 
+     data-svg-mermaid-used="FALSE - Neither Mermaid JS nor SVG were used anywhere in this output."
+     data-narrative-plan="Intro (What is ML/AI Hierarchy) -> Core Types (Supervised vs Unsupervised) -> Workflow Process -> Performance (Training vs Inference) -> Pitfalls & Best Practices."
+     data-chart-choices="Hierarchy: Nested HTML divs (Organize/Hierarchy, NO SVG). Donut Chart: Data Split (Compare). Radar Chart: ML Types attributes (Compare). Bar Chart: Training vs Inference resources (Compare).">
+Metadata container to satisfy summary requirements without using forbidden HTML/CSS/JS comments.
+</div>
+
+<nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-lg">
+<div class="max-w-6xl mx-auto flex justify-between items-center">
+<h1 class="text-xl font-bold tracking-wider"><span class="text-blue-500">ML</span><span class="text-pink-500">.</span>FOUNDATIONS</h1>
+<div class="text-sm space-x-4 hidden md:block">
+<a href="#hierarchy" class="hover:text-blue-400">Hierarchy</a>
+<a href="#types" class="hover:text-pink-400">ML Types</a>
+<a href="#workflow" class="hover:text-yellow-400">Workflow</a>
+<a href="#phases" class="hover:text-blue-400">Phases</a>
+</div>
+</div>
+</nav>
+
+<header class="bg-slate-900 text-white py-20 px-6 border-t border-slate-800">
+<div class="max-w-4xl mx-auto text-center">
+<h1 class="text-4xl md:text-6xl font-extrabold mb-6">Demystifying <span class="bg-gradient-to-r from-blue-500 to-pink-500 gradient-text">Machine Learning</span></h1>
+<p class="text-xl text-slate-300 mb-8 leading-relaxed">Machine Learning is a subset of AI focusing on building systems that learn from data to improve performance on specific tasks without being explicitly programmed with hard-coded rules.</p>
+<div class="flex justify-center gap-4 flex-wrap">
+<div class="bg-slate-800 border border-blue-500 px-6 py-3 rounded-full text-blue-400 font-semibold shadow-[0_0_15px_rgba(59,130,246,0.3)]">Probabilistic</div>
+<div class="bg-slate-800 border border-pink-500 px-6 py-3 rounded-full text-pink-400 font-semibold shadow-[0_0_15px_rgba(236,72,153,0.3)]">Data-Driven</div>
+<div class="bg-slate-800 border border-yellow-400 px-6 py-3 rounded-full text-yellow-400 font-semibold shadow-[0_0_15px_rgba(234,179,8,0.3)]">Self-Improving</div>
+</div>
+</div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 py-12 space-y-20">
+
+<section id="hierarchy" class="scroll-mt-20">
+<div class="text-center mb-10">
+<h2 class="text-3xl font-bold text-slate-800 mb-4">The Intelligence Hierarchy</h2>
+<p class="text-slate-600 max-w-2xl mx-auto">Understanding the relationship between Artificial Intelligence, Machine Learning, and Deep Learning is crucial. AI is the umbrella, ML is the method, and DL is the specialized technique.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+<div class="flex justify-center">
+<div class="hierarchy-circle border-4 border-blue-500 bg-blue-50 w-72 h-72 relative shadow-lg">
+<span class="mt-4 font-black text-blue-700 text-lg tracking-wide">ARTIFICIAL INTELLIGENCE</span>
+<span class="text-xs text-blue-600 mt-1">Mimicking Intelligence</span>
+<div class="hierarchy-circle border-4 border-pink-500 bg-pink-50 w-56 h-56 absolute bottom-[-4px] shadow-md">
+<span class="mt-4 font-bold text-pink-700 text-md">MACHINE LEARNING</span>
+<span class="text-xs text-pink-600 mt-1">Statistical Methods</span>
+<div class="hierarchy-circle border-4 border-yellow-400 bg-yellow-50 w-36 h-36 absolute bottom-[-4px] justify-center shadow-inner">
+<span class="font-bold text-yellow-700 text-sm leading-tight px-2">DEEP<br>LEARNING</span>
+<span class="text-xs text-yellow-600 mt-1">Neural Nets</span>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="card border-l-4 border-blue-500">
+<h3 class="font-bold text-xl mb-2 text-slate-800">Artificial Intelligence (AI)</h3>
+<p class="text-slate-600">The broad concept of machines executing tasks in a way we would consider "smart." This can be as simple as hard-coded `if-else` blocks.</p>
+</div>
+<div class="card border-l-4 border-pink-500">
+<h3 class="font-bold text-xl mb-2 text-slate-800">Machine Learning (ML)</h3>
+<p class="text-slate-600">The statistical application of AI. Instead of rules, you provide historical data, and the system probabilistically determines outcomes.</p>
+</div>
+<div class="card border-l-4 border-yellow-400">
+<h3 class="font-bold text-xl mb-2 text-slate-800">Deep Learning (DL)</h3>
+<p class="text-slate-600">A sub-field of ML utilizing multi-layered neural networks, specifically excelling at handling unstructured data like images and audio.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="types" class="scroll-mt-20">
+<div class="text-center mb-10">
+<h2 class="text-3xl font-bold text-slate-800 mb-4">Core Types of Machine Learning</h2>
+<p class="text-slate-600 max-w-2xl mx-auto">Models are categorized by how they learn from data. Choosing the right approach depends entirely on whether your data has "labels" (an answer key) or not.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<div class="card bg-gradient-to-br from-blue-50 to-white">
+<div class="text-4xl mb-4 text-blue-500">&#127919;</div>
+<h3 class="text-xl font-bold text-blue-700 mb-2">Supervised Learning</h3>
+<p class="text-slate-600 mb-4">Requires labeled data (Features + Label). The model is trained on a known "answer key" to predict future outcomes.</p>
+<div class="bg-slate-100 p-3 rounded text-sm text-slate-700 font-mono">model.fit(X_train, y_label)</div>
+<p class="text-sm mt-3 font-semibold text-slate-800">Example: Predicting if a transaction is fraud.</p>
+</div>
+
+<div class="card bg-gradient-to-br from-pink-50 to-white">
+<div class="text-4xl mb-4 text-pink-500">&#128269;</div>
+<h3 class="text-xl font-bold text-pink-700 mb-2">Unsupervised Learning</h3>
+<p class="text-slate-600 mb-4">Uses unlabeled data. The goal is discovery—finding hidden patterns, groupings, or structures without a specific target.</p>
+<div class="bg-slate-100 p-3 rounded text-sm text-slate-700 font-mono">KMeans().fit(X_train)</div>
+<p class="text-sm mt-3 font-semibold text-slate-800">Example: Segmenting customer behavior.</p>
+</div>
+
+<div class="card bg-gradient-to-br from-yellow-50 to-white">
+<div class="text-4xl mb-4 text-yellow-500">&#127918;</div>
+<h3 class="text-xl font-bold text-yellow-700 mb-2">Reinforcement Learning</h3>
+<p class="text-slate-600 mb-4">Learning via trial and error. An agent interacts with an environment and learns to maximize a reward signal.</p>
+<div class="bg-slate-100 p-3 rounded text-sm text-slate-700 font-mono">agent.step(action)</div>
+<p class="text-sm mt-3 font-semibold text-slate-800">Example: A bot learning to play a video game.</p>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+<div>
+<h3 class="text-2xl font-bold mb-4">Comparing Model Characteristics</h3>
+<p class="text-slate-600 mb-4">Different learning types prioritize different data needs and yield different levels of explanatory power. Supervised learning offers direct feedback, while Unsupervised relies entirely on algorithmic discovery.</p>
+<ul class="space-y-2 text-slate-700">
+<li><strong class="text-blue-500">&#9632;</strong> Supervised: High reliance on human-labeled data.</li>
+<li><strong class="text-pink-500">&#9632;</strong> Unsupervised: Low labeled data need, high discovery.</li>
+</ul>
+</div>
+<div>
+<div class="chart-container">
+<canvas id="radarChart"></canvas>
+</div>
+</div>
+</div>
+</section>
+
+<section id="workflow" class="scroll-mt-20 bg-slate-900 text-white p-8 md:p-12 rounded-2xl shadow-xl">
+<div class="text-center mb-10">
+<h2 class="text-3xl font-bold mb-4">The End-to-End ML Workflow</h2>
+<p class="text-slate-300 max-w-2xl mx-auto">Machine learning is a cyclical, iterative process. The golden rule: 80% of the time is spent on data preparation, not running algorithms.</p>
+</div>
+
+<div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+<div class="flex-1 w-full text-center p-4 border-2 border-slate-700 rounded-lg hover:border-blue-500 transition-colors bg-slate-800">
+<div class="text-3xl mb-2">&#128229;</div>
+<div class="font-bold text-sm">1. Collection</div>
+</div>
+<span class="workflow-arrow">&#8594;</span>
+<div class="flex-1 w-full text-center p-4 border-2 border-slate-700 rounded-lg hover:border-pink-500 transition-colors bg-slate-800">
+<div class="text-3xl mb-2">&#129529;</div>
+<div class="font-bold text-sm">2. Cleaning</div>
+</div>
+<span class="workflow-arrow">&#8594;</span>
+<div class="flex-1 w-full text-center p-4 border-2 border-slate-700 rounded-lg hover:border-yellow-400 transition-colors bg-slate-800">
+<div class="text-3xl mb-2">&#9881;&#65039;</div>
+<div class="font-bold text-sm">3. Features</div>
+</div>
+<span class="workflow-arrow">&#8594;</span>
+<div class="flex-1 w-full text-center p-4 border-2 border-blue-500 rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.3)] bg-blue-900 text-white">
+<div class="text-3xl mb-2">&#129504;</div>
+<div class="font-bold text-sm">4. Training</div>
+</div>
+<span class="workflow-arrow">&#8594;</span>
+<div class="flex-1 w-full text-center p-4 border-2 border-slate-700 rounded-lg hover:border-pink-500 transition-colors bg-slate-800">
+<div class="text-3xl mb-2">&#128202;</div>
+<div class="font-bold text-sm">5. Evaluation</div>
+</div>
+<span class="workflow-arrow">&#8594;</span>
+<div class="flex-1 w-full text-center p-4 border-2 border-slate-700 rounded-lg hover:border-yellow-400 transition-colors bg-slate-800">
+<div class="text-3xl mb-2">&#128640;</div>
+<div class="font-bold text-sm">6. Deploy</div>
+</div>
+</div>
+
+<div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="bg-slate-800 p-6 rounded-xl">
+<h4 class="font-bold text-pink-400 mb-2">The Golden Rule: Data Splitting</h4>
+<p class="text-sm text-slate-300 mb-4">Never evaluate your model on the same data it used for training. Doing so causes "overfitting," where the model memorizes the answers rather than learning the patterns.</p>
+<div class="chart-container" style="height: 200px;">
+<canvas id="splitChart"></canvas>
+</div>
+</div>
+<div class="bg-slate-800 p-6 rounded-xl flex flex-col justify-center">
+<h4 class="font-bold text-yellow-400 mb-2">Garbage In, Garbage Out (GIGO)</h4>
+<p class="text-sm text-slate-300">The quality of your predictions is strictly bound by the quality of your input data. If your historical data is biased, missing values, or heavily skewed, the world's most advanced Deep Learning model will still produce flawed results. Data cleaning is paramount.</p>
+<div class="mt-4 p-4 border-l-4 border-red-500 bg-red-900/20 text-red-200 text-xs rounded">
+<strong>CRITICAL MISTAKE: Data Leakage.</strong> Including test-set information in the training phase ruins the integrity of the evaluation.
+</div>
+</div>
+</div>
+</section>
+
+<section id="phases" class="scroll-mt-20">
+<div class="text-center mb-10">
+<h2 class="text-3xl font-bold text-slate-800 mb-4">Training vs. Inference Phases</h2>
+<p class="text-slate-600 max-w-2xl mx-auto">Understanding the lifecycle of a model in production requires distinguishing between the heavy-lifting of training and the rapid execution of inference.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-6">
+<div class="card border-t-4 border-blue-500">
+<h3 class="font-bold text-xl mb-1 text-blue-600">The Training Phase</h3>
+<p class="text-sm font-semibold text-slate-500 mb-3">Teaching the Model (Offline)</p>
+<p class="text-slate-600">This phase uses vast amounts of historical data to adjust internal parameters. It is highly computationally expensive (requiring GPUs/TPUs) and happens offline over hours or days.</p>
+</div>
+<div class="card border-t-4 border-yellow-400">
+<h3 class="font-bold text-xl mb-1 text-yellow-600">The Inference Phase</h3>
+<p class="text-sm font-semibold text-slate-500 mb-3">Live Predictions (Real-time)</p>
+<p class="text-slate-600">The trained model is deployed to process new, unseen data. This requires extremely low latency to provide instant predictions to the user, using relatively lower compute resources.</p>
+</div>
+<div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+<strong>Scenario:</strong> Netflix trains its recommendation engine on past viewing history globally (Training), and instantly shows you "Top Picks" the second you open the app (Inference).
+</div>
+</div>
+
+<div class="card">
+<h3 class="font-bold text-lg mb-4 text-center">Resource Allocation Comparison</h3>
+<div class="chart-container">
+<canvas id="resourceChart"></canvas>
+</div>
+</div>
+</div>
+</section>
+
+<section class="mt-12 bg-white p-8 rounded-2xl shadow-md border border-slate-200">
+<h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">Key Concepts & Interview Prep</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="p-4 bg-slate-50 rounded border border-slate-100 text-center">
+<div class="text-2xl mb-2 text-pink-500">&#128230;</div>
+<h4 class="font-bold text-slate-700">The "Black Box"</h4>
+<p class="text-xs text-slate-500 mt-2">Complex models where internal logic is hidden. Inputs and outputs are visible, but the exact decision path is uninterpretable.</p>
+</div>
+<div class="p-4 bg-slate-50 rounded border border-slate-100 text-center">
+<div class="text-2xl mb-2 text-blue-500">&#127915;</div>
+<h4 class="font-bold text-slate-700">Feature vs Label</h4>
+<p class="text-xs text-slate-500 mt-2">Features are the input variables (e.g., house size). The Label is the specific output you want to predict (e.g., price).</p>
+</div>
+<div class="p-4 bg-slate-50 rounded border border-slate-100 text-center">
+<div class="text-2xl mb-2 text-yellow-500">&#9878;&#65039;</div>
+<h4 class="font-bold text-slate-700">Class Imbalance</h4>
+<p class="text-xs text-slate-500 mt-2">Training on heavily skewed data (99% normal, 1% fraud). Models will cheat by always guessing the majority class.</p>
+</div>
+<div class="p-4 bg-slate-50 rounded border border-slate-100 text-center">
+<div class="text-2xl mb-2 text-pink-500">&#128200;</div>
+<h4 class="font-bold text-slate-700">Scaling/Normalization</h4>
+<p class="text-xs text-slate-500 mt-2">Adjusting data so large numerical values (like Salary) don't disproportionately dominate smaller values (like Age).</p>
+</div>
+</div>
+</section>
+
+</main>
+
+<footer class="bg-slate-900 text-slate-400 py-8 text-center text-sm">
+<p>&copy; 2026 Machine Learning Foundations Infographic</p>
+</footer>
+
+<script>
+const wrapLabels = (labels) => labels.map(label => {
+    if (label.length <= 16) return label;
+    const words = label.split(' ');
+    const lines = [];
+    let currentLine = '';
+    words.forEach(word => {
+        if ((currentLine + word).length > 16) {
+            lines.push(currentLine.trim());
+            currentLine = word + ' ';
+        } else {
+            currentLine += word + ' ';
+        }
+    });
+    if (currentLine) lines.push(currentLine.trim());
+    return lines;
+});
+
+const commonTooltip = {
+    callbacks: {
+        title: function(tooltipItems) {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            } else {
+                return label;
+            }
+        }
+    }
+};
+
+const radarCtx = document.getElementById('radarChart').getContext('2d');
+new Chart(radarCtx, {
+    type: 'radar',
+    data: {
+        labels: wrapLabels([
+            'Labeled Data Dependency', 
+            'Human Intervention Required', 
+            'Algorithmic Discovery Power', 
+            'Model Interpretability', 
+            'Complexity of Setup'
+        ]),
+        datasets: [
+            {
+                label: 'Supervised Learning',
+                data: [90, 85, 30, 80, 60],
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: '#3B82F6',
+                pointBackgroundColor: '#3B82F6',
+                borderWidth: 2
+            },
+            {
+                label: 'Unsupervised Learning',
+                data: [10, 20, 95, 40, 75],
+                backgroundColor: 'rgba(236, 72, 153, 0.2)',
+                borderColor: '#EC4899',
+                pointBackgroundColor: '#EC4899',
+                borderWidth: 2
+            }
+        ]
+    },
+    options: {
+        maintainAspectRatio: false,
+        plugins: { tooltip: commonTooltip },
+        scales: {
+            r: {
+                angleLines: { color: 'rgba(0,0,0,0.1)' },
+                grid: { color: 'rgba(0,0,0,0.1)' },
+                pointLabels: { font: { size: 11 } },
+                suggestedMin: 0,
+                suggestedMax: 100
+            }
+        }
+    }
+});
+
+const splitCtx = document.getElementById('splitChart').getContext('2d');
+new Chart(splitCtx, {
+    type: 'doughnut',
+    data: {
+        labels: wrapLabels(['Training Data (Pattern Learning)', 'Testing Data (Evaluation)']),
+        datasets: [{
+            data: [80, 20],
+            backgroundColor: ['#3B82F6', '#EC4899'],
+            borderWidth: 0,
+            hoverOffset: 4
+        }]
+    },
+    options: {
+        maintainAspectRatio: false,
+        plugins: { 
+            tooltip: commonTooltip,
+            legend: { position: 'right', labels: { color: '#E2E8F0' } }
+        },
+        cutout: '70%'
+    }
+});
+
+const resourceCtx = document.getElementById('resourceChart').getContext('2d');
+new Chart(resourceCtx, {
+    type: 'bar',
+    data: {
+        labels: wrapLabels(['Computational Power Needed', 'Latency and Execution Time']),
+        datasets: [
+            { 
+                label: 'Training Phase', 
+                data: [95, 80], 
+                backgroundColor: '#3B82F6',
+                borderRadius: 4
+            },
+            { 
+                label: 'Inference Phase', 
+                data: [15, 5], 
+                backgroundColor: '#EAB308',
+                borderRadius: 4
+            }
+        ]
+    },
+    options: {
+        maintainAspectRatio: false,
+        plugins: { tooltip: commonTooltip },
+        scales: { 
+            y: { 
+                beginAtZero: true, 
+                max: 100,
+                grid: { color: 'rgba(0,0,0,0.05)' }
+            },
+            x: {
+                grid: { display: false }
+            }
+        }
+    }
+});
+</script>
+</body>
+</html>

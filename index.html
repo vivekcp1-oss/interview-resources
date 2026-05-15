@@ -1,414 +1,975 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Machine Learning Fundamentals Infographic</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #FAFAF9; color: #1C1917; margin: 0; padding: 0; }
-.chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 320px; max-height: 400px; }
-@media (min-width: 768px) { .chart-container { height: 380px; } }
-.card { background: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); padding: 1.5rem; transition: transform 0.2s; border: 1px solid #E7E5E4; }
-.card:hover { transform: translateY(-5px); border-color: #FECACA; }
-.gradient-text { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.hierarchy-circle { border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; }
-.workflow-arrow { font-size: 1.5rem; color: #D6D3D1; font-weight: bold; margin: 0 0.5rem; }
-@media (max-width: 767px) { .workflow-arrow { transform: rotate(90deg); margin: 0.5rem 0; } }
-</style>
-</head>
-<body>
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Database, Server, Layout, Zap, Shield, Activity, Table as TableIcon, 
+  Key, Hash, CheckCircle2, XCircle, Search, SplitSquareHorizontal, 
+  Layers, ArrowRight, Play, Lock, Users, MessageSquare, Heart, 
+  Bookmark, Code, RefreshCw, Cpu, DatabaseBackup, Gauge, Maximize,
+  Share2, Settings
+} from 'lucide-react';
 
-<div style="display:none;" 
-     data-palette="Primary Red (#DC2626), Soft Red (#FEE2E2), Warm Beige (#F5F5F4), Deep Stone (#1C1917)" 
-     data-svg-mermaid-used="FALSE - Neither Mermaid JS nor SVG were used anywhere in this output."
-     data-narrative-plan="Intro (What is ML/AI Hierarchy) -> Core Types (Supervised vs Unsupervised) -> Workflow Process -> Performance (Training vs Inference) -> Pitfalls & Best Practices."
-     data-chart-choices="Hierarchy: Nested HTML divs (Organize/Hierarchy, NO SVG). Donut Chart: Data Split (Compare). Radar Chart: ML Types attributes (Compare). Bar Chart: Training vs Inference resources (Compare).">
-Metadata container to satisfy summary requirements without using forbidden HTML/CSS/JS comments.
-</div>
+// --- Global Styles for Animations & Scrollbars ---
+const globalStyles = `
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(2deg); }
+  }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  
+  /* Clean, professional light theme card styling */
+  .pro-card { 
+    background: #ffffff; 
+    border: 1px solid #e5e7eb; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); 
+    transition: all 0.2s ease; 
+  }
+  .pro-card:hover { 
+    border-color: #fca5a5; 
+    box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.08), 0 4px 6px -2px rgba(220, 38, 38, 0.04); 
+    transform: translateY(-2px); 
+  }
+`;
 
-<nav class="bg-stone-900 text-stone-100 p-4 sticky top-0 z-50 shadow-md">
-<div class="max-w-6xl mx-auto flex justify-between items-center">
-<h1 class="text-xl font-bold tracking-wider"><span class="text-red-500">ML</span><span class="text-stone-400">.</span>FOUNDATIONS</h1>
-<div class="text-sm space-x-4 hidden md:block">
-<a href="#hierarchy" class="hover:text-red-400 transition-colors">Hierarchy</a>
-<a href="#types" class="hover:text-red-400 transition-colors">ML Types</a>
-<a href="#workflow" class="hover:text-red-400 transition-colors">Workflow</a>
-<a href="#phases" class="hover:text-red-400 transition-colors">Phases</a>
-</div>
-</div>
-</nav>
+// --- Components ---
 
-<header class="bg-stone-900 text-stone-100 py-24 px-6 border-t border-stone-800">
-<div class="max-w-4xl mx-auto text-center">
-<h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">Demystifying <span class="bg-gradient-to-r from-red-600 to-red-400 gradient-text">Machine Learning</span></h1>
-<p class="text-xl text-stone-400 mb-8 leading-relaxed font-light">Machine Learning is a subset of AI focusing on building systems that learn from data to improve performance on specific tasks without explicit programming.</p>
-<div class="flex justify-center gap-4 flex-wrap">
-<div class="bg-stone-800 border border-red-600/30 px-6 py-3 rounded-full text-red-100 font-medium shadow-[0_0_20px_rgba(220,38,38,0.1)]">Probabilistic</div>
-<div class="bg-stone-800 border border-red-600/30 px-6 py-3 rounded-full text-red-100 font-medium shadow-[0_0_20px_rgba(220,38,38,0.1)]">Data-Driven</div>
-<div class="bg-stone-800 border border-red-600/30 px-6 py-3 rounded-full text-red-100 font-medium shadow-[0_0_20px_rgba(220,38,38,0.1)]">Self-Improving</div>
-</div>
-</div>
-</header>
+const SectionHeading = ({ title, subtitle, icon: Icon }) => (
+  <div className="mb-10 text-center space-y-4">
+    <div className="inline-flex items-center justify-center p-3 bg-red-50 rounded-2xl border border-red-100 mb-2">
+      <Icon className="w-8 h-8 text-red-600" />
+    </div>
+    <h2 className="text-4xl font-extrabold tracking-tight text-slate-900">
+      {title}
+    </h2>
+    <p className="text-slate-500 max-w-2xl mx-auto text-lg">{subtitle}</p>
+  </div>
+);
 
-<main class="max-w-6xl mx-auto px-6 py-16 space-y-24">
+// 1. Hero Section
+const HeroSection = () => (
+  <div className="relative min-h-[80vh] flex flex-col items-center justify-center text-center py-20 px-4 overflow-hidden">
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-100/50 blur-[100px] rounded-full pointer-events-none" />
+    
+    <div className="relative z-10 space-y-8 max-w-4xl">
+      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-red-200 text-sm font-semibold text-red-600 shadow-sm">
+        <Sparkles className="w-4 h-4" /> Interactive Masterclass
+      </div>
+      <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 leading-tight">
+        Database <br />
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-red-800">
+          Schema Design
+        </span>
+      </h1>
+      <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+        Building scalable, efficient, and reliable databases for real-world systems. 
+        Master relational modeling, normalization, and optimization.
+      </p>
+      
+      <div className="flex flex-wrap justify-center gap-6 mt-12">
+        <div className="animate-float" style={{animationDelay: '0s'}}>
+          <div className="pro-card p-6 rounded-2xl flex flex-col items-center gap-3 min-w-[160px]">
+            <Database className="w-10 h-10 text-red-600" />
+            <span className="font-semibold text-slate-700">Relational Models</span>
+          </div>
+        </div>
+        <div className="animate-float" style={{animationDelay: '1s'}}>
+          <div className="pro-card p-6 rounded-2xl flex flex-col items-center gap-3 min-w-[160px]">
+            <Zap className="w-10 h-10 text-red-600" />
+            <span className="font-semibold text-slate-700">Query Optimization</span>
+          </div>
+        </div>
+        <div className="animate-float" style={{animationDelay: '2s'}}>
+          <div className="pro-card p-6 rounded-2xl flex flex-col items-center gap-3 min-w-[160px]">
+            <Shield className="w-10 h-10 text-red-600" />
+            <span className="font-semibold text-slate-700">Data Integrity</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
-<section id="hierarchy" class="scroll-mt-20">
-<div class="text-center mb-12">
-<h2 class="text-3xl font-bold text-stone-800 mb-4">The Intelligence Hierarchy</h2>
-<p class="text-stone-600 max-w-2xl mx-auto font-light">Understanding the nested relationship: AI is the broad vision, ML is the statistical engine, and DL is the specialized neural network layer.</p>
-</div>
+// Utility icon for hero
+const Sparkles = (props) => (
+  <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 3v18" /><path d="M3 12h18" />
+    <path d="m8 8-4-4" /><path d="m16 8 4-4" />
+    <path d="m8 16-4 4" /><path d="m16 16 4 4" />
+  </svg>
+);
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-<div class="flex justify-center">
-<div class="hierarchy-circle border-4 border-red-800 bg-red-50 w-72 h-72 relative shadow-lg">
-<span class="mt-4 font-black text-red-900 text-lg tracking-wide uppercase">AI</span>
-<span class="text-xs text-red-800 mt-1">Mimicking Intelligence</span>
-<div class="hierarchy-circle border-4 border-red-600 bg-white w-56 h-56 absolute bottom-[-4px] shadow-md">
-<span class="mt-4 font-bold text-red-700 text-md uppercase">ML</span>
-<span class="text-xs text-red-600 mt-1">Statistical Methods</span>
-<div class="hierarchy-circle border-4 border-stone-300 bg-stone-50 w-36 h-36 absolute bottom-[-4px] justify-center shadow-inner">
-<span class="font-bold text-stone-700 text-sm leading-tight px-2 uppercase">Deep<br>Learning</span>
-<span class="text-xs text-stone-500 mt-1">Neural Nets</span>
-</div>
-</div>
-</div>
-</div>
-<div class="space-y-4">
-<div class="card border-l-4 border-red-800">
-<h3 class="font-bold text-xl mb-2 text-stone-800">Artificial Intelligence (AI)</h3>
-<p class="text-stone-600 leading-relaxed text-sm">The broad concept of machines executing tasks in a way we consider "smart." This can include simple rule-based logic.</p>
-</div>
-<div class="card border-l-4 border-red-600">
-<h3 class="font-bold text-xl mb-2 text-stone-800">Machine Learning (ML)</h3>
-<p class="text-stone-600 leading-relaxed text-sm">The statistical application of AI. Instead of rules, the system probabilistically determines outcomes based on historical patterns.</p>
-</div>
-<div class="card border-l-4 border-stone-400">
-<h3 class="font-bold text-xl mb-2 text-stone-800">Deep Learning (DL)</h3>
-<p class="text-stone-600 leading-relaxed text-sm">A specialized sub-field utilizing multi-layered neural networks to handle complex, unstructured data like speech or imagery.</p>
-</div>
-</div>
-</div>
-</section>
+// 2. What is DBMS?
+const DBMSIntro = () => (
+  <div className="space-y-12">
+    <SectionHeading title="What is a DBMS?" subtitle="The engine behind every modern application." icon={Server} />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="pro-card rounded-3xl p-8 col-span-1 md:col-span-2 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
+          <Database className="w-48 h-48 text-red-900" />
+        </div>
+        <h3 className="text-2xl font-bold text-slate-900 mb-4">The Brain of Your Data</h3>
+        <p className="text-slate-600 text-lg leading-relaxed mb-6 max-w-lg">
+          A Database Management System (DBMS) is software that interacts with end-users, applications, and the database itself to capture and analyze the data. Think of it as a highly efficient, secure digital library manager.
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          {['Storage Manager', 'Query Engine', 'Security Controller', 'Data Organizer'].map((role) => (
+            <div key={role} className="flex items-center gap-3 text-slate-700">
+              <CheckCircle2 className="w-5 h-5 text-red-600" />
+              <span className="font-medium">{role}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className="pro-card rounded-3xl p-8 flex flex-col justify-center">
+        <h3 className="text-xl font-bold text-slate-900 mb-6">Popular Systems</h3>
+        <div className="space-y-4 text-slate-700 font-medium">
+          <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl">
+            <span>PostgreSQL</span> <span className="text-xs text-red-700 bg-red-100 px-2 py-1 rounded font-bold">Relational</span>
+          </div>
+          <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl">
+            <span>MySQL</span> <span className="text-xs text-red-700 bg-red-100 px-2 py-1 rounded font-bold">Relational</span>
+          </div>
+          <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl">
+            <span>MongoDB</span> <span className="text-xs text-slate-600 bg-slate-200 px-2 py-1 rounded font-bold">NoSQL</span>
+          </div>
+          <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl">
+            <span>Redis</span> <span className="text-xs text-slate-600 bg-slate-200 px-2 py-1 rounded font-bold">Key-Value</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
-<section id="types" class="scroll-mt-20">
-<div class="text-center mb-12">
-<h2 class="text-3xl font-bold text-stone-800 mb-4">Core Types of Machine Learning</h2>
-<p class="text-stone-600 max-w-2xl mx-auto font-light">Categorized by the learning signal: whether labels are provided, rewards are given, or structure is discovered.</p>
-</div>
+// 3. Relational Model
+const RelationalModel = () => {
+  const [hoveredRow, setHoveredRow] = useState(null);
+  const [hoveredCol, setHoveredCol] = useState(null);
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-<div class="card bg-white hover:bg-stone-50">
-<div class="text-4xl mb-4 text-red-600 opacity-80">&#127919;</div>
-<h3 class="text-xl font-bold text-stone-800 mb-2">Supervised Learning</h3>
-<p class="text-stone-600 text-sm mb-4 leading-relaxed">Requires labeled data. The model learns from a known "answer key" to map inputs to specific targets.</p>
-<div class="bg-stone-100 p-3 rounded text-xs text-stone-700 font-mono">model.fit(X, y)</div>
-<p class="text-xs mt-3 font-semibold text-red-800 uppercase tracking-tighter">Case: Fraud Detection</p>
-</div>
+  const data = [
+    { id: 101, name: 'Alice Smith', email: 'alice@mail.com', status: 'Active' },
+    { id: 102, name: 'Bob Johnson', email: 'bob@mail.com', status: 'Inactive' },
+    { id: 103, name: 'Charlie Lee', email: 'charlie@mail.com', status: 'Active' },
+  ];
 
-<div class="card bg-white hover:bg-stone-50">
-<div class="text-4xl mb-4 text-red-400 opacity-80">&#128269;</div>
-<h3 class="text-xl font-bold text-stone-800 mb-2">Unsupervised Learning</h3>
-<p class="text-stone-600 text-sm mb-4 leading-relaxed">Uses unlabeled data to discover hidden patterns, groupings, or structural relationships without a target.</p>
-<div class="bg-stone-100 p-3 rounded text-xs text-stone-700 font-mono">KMeans().fit(X)</div>
-<p class="text-xs mt-3 font-semibold text-red-800 uppercase tracking-tighter">Case: Customer Segments</p>
-</div>
+  return (
+    <div className="space-y-12">
+      <SectionHeading title="The Relational Model" subtitle="Organizing data into tables (relations) with rows and columns." icon={TableIcon} />
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+        <div className="pro-card p-8 rounded-3xl col-span-2 overflow-x-auto">
+          <div className="mb-6 flex justify-between items-center">
+            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <TableIcon className="text-red-600 w-5 h-5"/> Users Table (Relation)
+            </h3>
+            <div className="text-sm px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-slate-600 font-semibold">
+              Degree: 4 | Cardinality: 3
+            </div>
+          </div>
+          
+          <table className="w-full text-left border-collapse border border-slate-200 rounded-lg overflow-hidden">
+            <thead className="bg-slate-50">
+              <tr>
+                {['user_id', 'full_name', 'email_address', 'account_status'].map((col, idx) => (
+                  <th 
+                    key={col} 
+                    onMouseEnter={() => setHoveredCol(idx)} 
+                    onMouseLeave={() => setHoveredCol(null)}
+                    className={`p-4 border-b border-slate-200 font-mono text-sm text-slate-600 transition-colors cursor-help
+                      ${hoveredCol === idx ? 'bg-red-50 text-red-700' : ''}`}
+                  >
+                    {col}
+                    {idx === 0 && <Key className="w-3 h-3 inline ml-2 text-yellow-500" />}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((row, rowIdx) => (
+                <tr 
+                  key={row.id}
+                  onMouseEnter={() => setHoveredRow(rowIdx)}
+                  onMouseLeave={() => setHoveredRow(null)}
+                  className={`transition-all duration-300 cursor-help border-b border-slate-100
+                    ${hoveredRow === rowIdx ? 'bg-red-50' : 'hover:bg-slate-50'}`}
+                >
+                  <td className={`p-4 font-mono text-sm font-semibold text-slate-700 ${hoveredCol === 0 ? 'bg-red-50/50 text-red-700' : ''}`}>{row.id}</td>
+                  <td className={`p-4 text-slate-800 ${hoveredCol === 1 ? 'bg-red-50/50' : ''}`}>{row.name}</td>
+                  <td className={`p-4 text-slate-600 ${hoveredCol === 2 ? 'bg-red-50/50' : ''}`}>{row.email}</td>
+                  <td className={`p-4 ${hoveredCol === 3 ? 'bg-red-50/50' : ''}`}>
+                    <span className={`px-2 py-1 rounded text-xs font-bold ${row.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                      {row.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-<div class="card bg-white hover:bg-stone-50">
-<div class="text-4xl mb-4 text-stone-400 opacity-80">&#127918;</div>
-<h3 class="text-xl font-bold text-stone-800 mb-2">Reinforcement Learning</h3>
-<p class="text-stone-600 text-sm mb-4 leading-relaxed">Learning via trial and error. An agent interacts with an environment to maximize cumulative reward signals.</p>
-<div class="bg-stone-100 p-3 rounded text-xs text-stone-700 font-mono">agent.step(action)</div>
-<p class="text-xs mt-3 font-semibold text-red-800 uppercase tracking-tighter">Case: Game AI</p>
-</div>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-stone-50 p-8 rounded-xl border border-stone-200">
-<div>
-<h3 class="text-2xl font-bold mb-4 text-stone-800">Learning Characteristics</h3>
-<p class="text-stone-600 mb-6 font-light">Supervised models excel at prediction accuracy given historical labels, while Unsupervised models are the primary choice for exploratory data analysis.</p>
-<div class="space-y-4">
-<div class="flex items-center gap-3">
-<div class="w-4 h-4 bg-red-600 rounded"></div>
-<span class="text-sm font-medium text-stone-700">Supervised: High Label Dependency</span>
-</div>
-<div class="flex items-center gap-3">
-<div class="w-4 h-4 bg-stone-300 rounded"></div>
-<span class="text-sm font-medium text-stone-700">Unsupervised: Pattern Discovery Focus</span>
-</div>
-</div>
-</div>
-<div>
-<div class="chart-container">
-<canvas id="radarChart"></canvas>
-</div>
-</div>
-</div>
-</section>
-
-<section id="workflow" class="scroll-mt-20 bg-stone-900 text-stone-100 p-8 md:p-16 rounded-3xl shadow-2xl">
-<div class="text-center mb-12">
-<h2 class="text-3xl font-bold mb-4">The End-to-End ML Workflow</h2>
-<p class="text-stone-400 max-w-2xl mx-auto font-light">Iterative and cyclical. The majority of project time is spent refining the data before a single model is ever trained.</p>
-</div>
-
-<div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 relative">
-<div class="flex-1 w-full text-center p-5 border border-stone-700 rounded-xl hover:bg-stone-800 transition-colors">
-<div class="text-2xl mb-2">📥</div>
-<div class="font-bold text-xs uppercase tracking-widest text-stone-400">1. Collection</div>
-</div>
-<span class="workflow-arrow text-red-700 opacity-50">&#10230;</span>
-<div class="flex-1 w-full text-center p-5 border border-stone-700 rounded-xl hover:bg-stone-800 transition-colors">
-<div class="text-2xl mb-2">🧹</div>
-<div class="font-bold text-xs uppercase tracking-widest text-stone-400">2. Cleaning</div>
-</div>
-<span class="workflow-arrow text-red-700 opacity-50">&#10230;</span>
-<div class="flex-1 w-full text-center p-5 border border-stone-700 rounded-xl hover:bg-stone-800 transition-colors">
-<div class="text-2xl mb-2">🔬</div>
-<div class="font-bold text-xs uppercase tracking-widest text-stone-400">3. Features</div>
-</div>
-<span class="workflow-arrow text-red-700 opacity-50">&#10230;</span>
-<div class="flex-1 w-full text-center p-5 border-2 border-red-600 rounded-xl bg-red-950/20 shadow-[0_0_25px_rgba(220,38,38,0.2)]">
-<div class="text-2xl mb-2">🔥</div>
-<div class="font-bold text-xs uppercase tracking-widest text-red-400">4. Training</div>
-</div>
-<span class="workflow-arrow text-red-700 opacity-50">&#10230;</span>
-<div class="flex-1 w-full text-center p-5 border border-stone-700 rounded-xl hover:bg-stone-800 transition-colors">
-<div class="text-2xl mb-2">📐</div>
-<div class="font-bold text-xs uppercase tracking-widest text-stone-400">5. Evaluation</div>
-</div>
-<span class="workflow-arrow text-red-700 opacity-50">&#10230;</span>
-<div class="flex-1 w-full text-center p-5 border border-stone-700 rounded-xl hover:bg-stone-800 transition-colors">
-<div class="text-2xl mb-2">🚀</div>
-<div class="font-bold text-xs uppercase tracking-widest text-stone-400">6. Deployment</div>
-</div>
-</div>
-
-<div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-10">
-<div class="bg-stone-800/50 p-8 rounded-2xl border border-stone-700">
-<h4 class="font-bold text-red-400 mb-3 text-lg">The 80/20 Rule: Data Splitting</h4>
-<p class="text-sm text-stone-400 mb-6 font-light">Partitioning data prevents "overfitting"—a state where the model memorizes noise instead of learning generalizable patterns.</p>
-<div class="chart-container" style="height: 220px;">
-<canvas id="splitChart"></canvas>
-</div>
-</div>
-<div class="flex flex-col justify-center space-y-6">
-<div>
-<h4 class="font-bold text-stone-100 mb-2">GIGO Principle</h4>
-<p class="text-sm text-stone-400 leading-relaxed font-light">"Garbage In, Garbage Out." A model is only as good as the data cleaning performed. Removing outliers and handling missing values is the priority.</p>
-</div>
-<div class="p-5 border-l-4 border-red-600 bg-red-900/10 rounded-r-lg">
-<span class="text-xs font-bold text-red-500 uppercase block mb-1">Fatal Error</span>
-<p class="text-xs text-stone-300"><strong>Data Leakage:</strong> Unintentionally exposing test-set information during training destroys real-world reliability.</p>
-</div>
-</div>
-</div>
-</section>
-
-<section id="phases" class="scroll-mt-20">
-<div class="text-center mb-12">
-<h2 class="text-3xl font-bold text-stone-800 mb-4">Training vs. Inference Phases</h2>
-<p class="text-slate-600 max-w-2xl mx-auto font-light">Modern ML systems split workloads between heavy-duty compute for learning and low-latency response for users.</p>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-<div class="space-y-6">
-<div class="card border-t-4 border-red-800">
-<h3 class="font-bold text-xl mb-1 text-red-900 uppercase tracking-tight">Phase A: Training</h3>
-<p class="text-xs font-bold text-stone-400 mb-4">Teaching the Engine (Batch Process)</p>
-<p class="text-sm text-stone-600 leading-relaxed">Adjusting millions of internal weights using historical data. Requires massive GPU/TPU power and happens offline.</p>
-</div>
-<div class="card border-t-4 border-stone-300">
-<h3 class="font-bold text-xl mb-1 text-stone-800 uppercase tracking-tight">Phase B: Inference</h3>
-<p class="text-xs font-bold text-stone-400 mb-4">Serving the Prediction (Real-Time)</p>
-<p class="text-sm text-stone-600 leading-relaxed">Processing live user input through the static trained model. Requires millisecond latency and optimized deployment.</p>
-</div>
-<div class="bg-red-50 p-5 rounded-xl border border-red-100 text-stone-700 text-sm italic">
-"Netflix trains on months of history (Training) to suggest a movie in seconds (Inference)."
-</div>
-</div>
-
-<div class="card bg-stone-50 border-stone-200">
-<h3 class="font-bold text-lg mb-6 text-center text-stone-800 uppercase tracking-wider text-sm">Compute Resource Demand</h3>
-<div class="chart-container">
-<canvas id="resourceChart"></canvas>
-</div>
-</div>
-</div>
-</section>
-
-<section class="mt-16 bg-stone-100 p-10 rounded-3xl border border-stone-200">
-<h2 class="text-2xl font-bold text-stone-800 mb-8 text-center uppercase tracking-widest text-sm">Advanced Vocabulary</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-<div class="space-y-2">
-<div class="w-10 h-10 bg-red-600 text-white rounded flex items-center justify-center font-bold">BB</div>
-<h4 class="font-bold text-stone-800 text-sm">Black Box</h4>
-<p class="text-xs text-stone-500 font-light">Highly complex models (DL) where decision paths are not human-interpretable.</p>
-</div>
-<div class="space-y-2">
-<div class="w-10 h-10 bg-red-400 text-white rounded flex items-center justify-center font-bold">F/L</div>
-<h4 class="font-bold text-stone-800 text-sm">Feature/Label</h4>
-<p class="text-xs text-stone-500 font-light">Input variables vs. the target outcome we aim to predict.</p>
-</div>
-<div class="space-y-2">
-<div class="w-10 h-10 bg-stone-400 text-white rounded flex items-center justify-center font-bold">CI</div>
-<h4 class="font-bold text-stone-800 text-sm">Class Imbalance</h4>
-<p class="text-xs text-stone-500 font-light">When one class dominates the dataset, causing the model to lean towards majority bias.</p>
-</div>
-<div class="space-y-2">
-<div class="w-10 h-10 bg-stone-800 text-white rounded flex items-center justify-center font-bold">SN</div>
-<h4 class="font-bold text-stone-800 text-sm">Scaling</h4>
-<p class="text-xs text-stone-500 font-light">Normalizing features so magnitude differences don't break the statistical math.</p>
-</div>
-</div>
-</section>
-
-</main>
-
-<footer class="bg-stone-900 text-stone-500 py-10 text-center text-xs tracking-widest uppercase border-t border-stone-800">
-<p>&copy; 2026 Machine Learning Foundations &bull; Earthy Red Edition</p>
-</footer>
-
-<script>
-const wrapLabels = (labels) => labels.map(label => {
-    if (label.length <= 16) return label;
-    const words = label.split(' ');
-    const lines = [];
-    let currentLine = '';
-    words.forEach(word => {
-        if ((currentLine + word).length > 16) {
-            lines.push(currentLine.trim());
-            currentLine = word + ' ';
-        } else {
-            currentLine += word + ' ';
-        }
-    });
-    if (currentLine) lines.push(currentLine.trim());
-    return lines;
-});
-
-const commonTooltip = {
-    backgroundColor: '#1C1917',
-    titleFont: { size: 13 },
-    bodyFont: { size: 12 },
-    padding: 10,
-    cornerRadius: 4,
-    callbacks: {
-        title: function(tooltipItems) {
-            const item = tooltipItems[0];
-            let label = item.chart.data.labels[item.dataIndex];
-            return Array.isArray(label) ? label.join(' ') : label;
-        }
-    }
+        <div className="space-y-4">
+          <InfoCard 
+            title="Tuple (Row)" 
+            desc="A single record containing data for one entity." 
+            active={hoveredRow !== null}
+          />
+          <InfoCard 
+            title="Attribute (Column)" 
+            desc="A property or characteristic of the entity." 
+            active={hoveredCol !== null}
+          />
+          <InfoCard 
+            title="Primary Key (PK)" 
+            desc="Unique identifier for a tuple (e.g., user_id)." 
+            active={hoveredCol === 0}
+          />
+        </div>
+      </div>
+    </div>
+  );
 };
 
-const radarCtx = document.getElementById('radarChart').getContext('2d');
-new Chart(radarCtx, {
-    type: 'radar',
-    data: {
-        labels: wrapLabels([
-            'Labeled Data Dependency', 
-            'Human Intervention Required', 
-            'Algorithmic Discovery Power', 
-            'Model Interpretability', 
-            'Complexity of Setup'
-        ]),
-        datasets: [
-            {
-                label: 'Supervised',
-                data: [95, 80, 20, 85, 60],
-                backgroundColor: 'rgba(220, 38, 38, 0.2)',
-                borderColor: '#DC2626',
-                pointBackgroundColor: '#DC2626',
-                borderWidth: 2
-            },
-            {
-                label: 'Unsupervised',
-                data: [10, 30, 95, 50, 80],
-                backgroundColor: 'rgba(168, 162, 158, 0.2)',
-                borderColor: '#A8A29E',
-                pointBackgroundColor: '#A8A29E',
-                borderWidth: 2
-            }
-        ]
-    },
-    options: {
-        maintainAspectRatio: false,
-        plugins: { tooltip: commonTooltip, legend: { position: 'bottom' } },
-        scales: {
-            r: {
-                angleLines: { color: 'rgba(0,0,0,0.05)' },
-                grid: { color: 'rgba(0,0,0,0.05)' },
-                pointLabels: { font: { size: 10, weight: 'bold' }, color: '#444' },
-                suggestedMin: 0,
-                suggestedMax: 100,
-                ticks: { display: false }
-            }
-        }
-    }
-});
+const InfoCard = ({ title, desc, active }) => {
+  return (
+    <div className={`p-5 rounded-2xl border transition-all duration-300 shadow-sm 
+      ${active ? 'border-red-300 bg-red-50 text-red-800 shadow-md transform scale-[1.02]' : 'border-slate-200 bg-white text-slate-600'}`}>
+      <h4 className={`font-bold mb-1 ${active ? 'text-red-900' : 'text-slate-900'}`}>{title}</h4>
+      <p className="text-sm">{desc}</p>
+    </div>
+  );
+};
 
-const splitCtx = document.getElementById('splitChart').getContext('2d');
-new Chart(splitCtx, {
-    type: 'doughnut',
-    data: {
-        labels: wrapLabels(['Training (Learning)', 'Testing (Proof)']),
-        datasets: [{
-            data: [80, 20],
-            backgroundColor: ['#DC2626', '#E7E5E4'],
-            hoverBackgroundColor: ['#B91C1C', '#D6D3D1'],
-            borderWidth: 0,
-            hoverOffset: 10
-        }]
-    },
-    options: {
-        maintainAspectRatio: false,
-        plugins: { 
-            tooltip: commonTooltip,
-            legend: { position: 'right', labels: { color: '#A8A29E', boxWidth: 12, padding: 20 } }
-        },
-        cutout: '75%'
-    }
-});
+// 4. Constraints Playground
+const ConstraintsPlayground = () => {
+  const [activeTab, setActiveTab] = useState('PRIMARY KEY');
+  const [demoState, setDemoState] = useState('idle'); // idle, valid, invalid
 
-const resourceCtx = document.getElementById('resourceChart').getContext('2d');
-new Chart(resourceCtx, {
-    type: 'bar',
-    data: {
-        labels: wrapLabels(['Compute Requirements', 'Latency Expectations']),
-        datasets: [
-            { 
-                label: 'Training Phase', 
-                data: [98, 85], 
-                backgroundColor: '#DC2626',
-                borderRadius: 2
-            },
-            { 
-                label: 'Inference Phase', 
-                data: [20, 5], 
-                backgroundColor: '#D6D3D1',
-                borderRadius: 2
-            }
-        ]
+  const constraints = {
+    'PRIMARY KEY': {
+      def: 'Ensures each row has a unique identifier and is not null.',
+      analogy: 'A Social Security Number or Passport ID.',
+      sql: `CREATE TABLE users (\n  user_id INT PRIMARY KEY,\n  name VARCHAR(50)\n);`,
+      valid: { act: 'Insert ID: 101', result: 'Success! 101 is unique.' },
+      invalid: { act: 'Insert ID: 101 (Again)', result: 'Error! Duplicate Key.' }
     },
-    options: {
-        maintainAspectRatio: false,
-        plugins: { tooltip: commonTooltip, legend: { position: 'bottom' } },
-        scales: { 
-            y: { 
-                beginAtZero: true, 
-                max: 100,
-                grid: { color: 'rgba(0,0,0,0.03)' },
-                ticks: { display: false }
-            },
-            x: {
-                grid: { display: false },
-                ticks: { color: '#78716C', font: { weight: 'bold' } }
-            }
-        }
+    'FOREIGN KEY': {
+      def: 'Ensures referential integrity between two tables.',
+      analogy: 'A guest pass that must match a valid host ID.',
+      sql: `CREATE TABLE orders (\n  order_id INT,\n  user_id INT,\n  FOREIGN KEY (user_id) \n  REFERENCES users(user_id)\n);`,
+      valid: { act: 'Insert user_id: 101 (Exists)', result: 'Success! User exists.' },
+      invalid: { act: 'Insert user_id: 999 (Missing)', result: 'Error! Parent key not found.' }
+    },
+    'UNIQUE': {
+      def: 'Ensures all values in a column are distinct.',
+      analogy: 'Email addresses in an app—no two users can share one.',
+      sql: `CREATE TABLE users (\n  email VARCHAR(100) UNIQUE\n);`,
+      valid: { act: 'Insert: a@mail.com', result: 'Success! Email is unique.' },
+      invalid: { act: 'Insert: a@mail.com (Again)', result: 'Error! Email already exists.' }
+    },
+    'NOT NULL': {
+      def: 'Ensures a column cannot have a NULL value.',
+      analogy: 'A required field on a web form.',
+      sql: `CREATE TABLE users (\n  password_hash VARCHAR(255) NOT NULL\n);`,
+      valid: { act: 'Insert: "xyz123"', result: 'Success! Value provided.' },
+      invalid: { act: 'Insert: NULL', result: 'Error! Column cannot be null.' }
     }
-});
-</script>
-</body>
-</html>
+  };
+
+  const current = constraints[activeTab];
+
+  const triggerSimulation = (type) => {
+    setDemoState(type);
+    setTimeout(() => setDemoState('idle'), 2000);
+  };
+
+  return (
+    <div className="space-y-12">
+      <SectionHeading title="Constraints Playground" subtitle="Rules that guarantee data integrity and reliability." icon={Shield} />
+      
+      <div className="pro-card rounded-3xl overflow-hidden grid grid-cols-1 md:grid-cols-12">
+        
+        {/* Sidebar Tabs */}
+        <div className="md:col-span-3 bg-slate-50 border-r border-slate-200 p-4 space-y-2">
+          {Object.keys(constraints).map((key) => (
+            <button
+              key={key}
+              onClick={() => {setActiveTab(key); setDemoState('idle');}}
+              className={`w-full text-left px-4 py-3 rounded-xl font-mono text-sm font-semibold transition-all
+                ${activeTab === key ? 'bg-red-50 text-red-700 border border-red-200 shadow-sm' : 'text-slate-600 hover:bg-slate-100 border border-transparent'}`}
+            >
+              {key}
+            </button>
+          ))}
+        </div>
+
+        {/* Content Area */}
+        <div className="md:col-span-9 p-8 space-y-8 relative bg-white">
+          <div>
+            <h3 className="text-2xl font-bold text-slate-900 mb-2">{activeTab}</h3>
+            <p className="text-slate-600">{current.def}</p>
+            <p className="text-sm text-slate-500 mt-2 italic border-l-4 border-red-200 pl-3">💡 {current.analogy}</p>
+          </div>
+
+          <div className="bg-slate-900 rounded-xl p-5 shadow-inner font-mono text-sm text-red-400 overflow-x-auto">
+            <pre>{current.sql}</pre>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <button 
+                onClick={() => triggerSimulation('valid')}
+                className="w-full py-3 px-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-emerald-700 font-bold transition flex justify-between items-center"
+              >
+                <span>{current.valid.act}</span>
+                <Play className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              <button 
+                onClick={() => triggerSimulation('invalid')}
+                className="w-full py-3 px-4 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl text-rose-700 font-bold transition flex justify-between items-center"
+              >
+                <span>{current.invalid.act}</span>
+                <Play className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Simulation Result Overlay */}
+          {demoState !== 'idle' && (
+            <div className={`absolute top-8 right-8 px-6 py-4 rounded-xl flex items-center gap-3 font-bold shadow-2xl animate-bounce border
+              ${demoState === 'valid' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300'}`}>
+              {demoState === 'valid' ? <CheckCircle2 className="w-6 h-6" /> : <XCircle className="w-6 h-6" />}
+              {current[demoState].result}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 5. DDL vs DML Arena
+const DDLDMLArena = () => {
+  const [mode, setMode] = useState('DDL'); // DDL or DML
+  const [tableSchema, setTableSchema] = useState(['id', 'name']);
+  const [tableData, setTableData] = useState([{id: 1, name: 'John'}]);
+  
+  const handleAction = (action) => {
+    if (action === 'CREATE') { setTableSchema(['id', 'name']); setTableData([]); }
+    if (action === 'ALTER') { if(!tableSchema.includes('age')) setTableSchema([...tableSchema, 'age']); }
+    if (action === 'DROP') { setTableSchema([]); setTableData([]); }
+    if (action === 'INSERT') { setTableData([...tableData, {id: Date.now().toString().slice(-3), name: 'NewUser', age: 25}]); }
+    if (action === 'UPDATE') { setTableData(tableData.map(r => ({...r, name: 'Updated'}))); }
+    if (action === 'DELETE') { setTableData(tableData.slice(0, -1)); }
+  };
+
+  return (
+    <div className="space-y-12">
+      <SectionHeading title="DDL vs DML" subtitle="Defining structure vs Manipulating data." icon={SplitSquareHorizontal} />
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Controls */}
+        <div className="space-y-6">
+          <div className="flex p-1 bg-slate-100 rounded-xl border border-slate-200">
+            <button 
+              onClick={() => setMode('DDL')}
+              className={`flex-1 py-3 rounded-lg font-bold transition ${mode === 'DDL' ? 'bg-white shadow text-red-600' : 'text-slate-500 hover:text-slate-800'}`}
+            >
+              DDL (Definition)
+            </button>
+            <button 
+              onClick={() => setMode('DML')}
+              className={`flex-1 py-3 rounded-lg font-bold transition ${mode === 'DML' ? 'bg-white shadow text-red-600' : 'text-slate-500 hover:text-slate-800'}`}
+            >
+              DML (Manipulation)
+            </button>
+          </div>
+
+          <div className="pro-card p-6 rounded-2xl space-y-4">
+            {mode === 'DDL' ? (
+              <>
+                <p className="text-slate-600 text-sm mb-4 font-medium">Commands that define the database schema.</p>
+                <ActionButton label="CREATE TABLE" onClick={() => handleAction('CREATE')} />
+                <ActionButton label="ALTER TABLE (Add Column)" onClick={() => handleAction('ALTER')} />
+                <ActionButton label="DROP TABLE" onClick={() => handleAction('DROP')} />
+              </>
+            ) : (
+              <>
+                <p className="text-slate-600 text-sm mb-4 font-medium">Commands that manipulate data inside tables.</p>
+                <ActionButton label="INSERT ROW" onClick={() => handleAction('INSERT')} disabled={tableSchema.length===0} />
+                <ActionButton label="UPDATE ROWS" onClick={() => handleAction('UPDATE')} disabled={tableData.length===0} />
+                <ActionButton label="DELETE ROW" onClick={() => handleAction('DELETE')} disabled={tableData.length===0} />
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Visualizer */}
+        <div className="pro-card rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px] bg-slate-50">
+          {tableSchema.length === 0 ? (
+            <div className="text-slate-400 flex flex-col items-center gap-2 font-medium">
+              <XCircle className="w-12 h-12 opacity-50" />
+              <p>No Table Exists. Use CREATE.</p>
+            </div>
+          ) : (
+            <div className="w-full overflow-x-auto transition-all duration-500 shadow-sm rounded-lg border border-slate-200">
+              <table className="w-full text-left border-collapse bg-white">
+                <thead className="bg-slate-100">
+                  <tr>
+                    {tableSchema.map(col => (
+                      <th key={col} className="p-3 font-mono text-red-600 text-sm border-b border-slate-200">{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {tableData.length === 0 ? (
+                    <tr><td colSpan={tableSchema.length} className="p-4 text-center text-slate-400 italic">Empty Table</td></tr>
+                  ) : (
+                    tableData.map((row, i) => (
+                      <tr key={i} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        {tableSchema.map(col => (
+                          <td key={col} className="p-3 text-slate-700 border-b border-slate-100 font-medium">
+                            {row[col] || <span className="text-slate-400 italic">NULL</span>}
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ActionButton = ({ label, onClick, disabled }) => (
+  <button 
+    onClick={onClick}
+    disabled={disabled}
+    className={`w-full py-3 px-4 rounded-xl font-mono text-left transition font-semibold
+      ${disabled ? 'opacity-50 cursor-not-allowed bg-slate-100 text-slate-400 border border-slate-200' : 
+      'bg-white hover:bg-red-50 hover:border-red-300 text-slate-700 border border-slate-200 shadow-sm'}`}
+  >
+    <code className="text-sm">&gt; {label}</code>
+  </button>
+);
+
+// 6. Normalization
+const Normalization = () => {
+  const [step, setStep] = useState(0); // 0: single, 1: highlight, 2: split, 3: normalized
+
+  const toggleNormalization = () => {
+    if (step === 0) {
+      setStep(1); // Stage 1: Highlight target columns
+      setTimeout(() => setStep(2), 1000); // Stage 2: Physically split apart
+      setTimeout(() => setStep(3), 2000); // Stage 3: Resolve to clean final tables
+    } else if (step === 3) {
+      setStep(2); 
+      setTimeout(() => setStep(1), 1000); 
+      setTimeout(() => setStep(0), 2000); 
+    }
+  };
+
+  const isAnimating = step === 1 || step === 2;
+  let btnText = "Normalize to 3NF";
+  if (step === 1) btnText = "Analyzing Schema...";
+  if (step === 2) btnText = "Splitting Tables...";
+  if (step === 3) btnText = "Revert to Unnormalized";
+
+  return (
+    <div className="space-y-12">
+      <SectionHeading title="Normalization" subtitle="Eliminating redundancy and dependency through a continuous animation." icon={Layers} />
+      
+      <div className="flex justify-center mb-8">
+        <button 
+          onClick={toggleNormalization}
+          disabled={isAnimating}
+          className={`flex items-center gap-3 px-8 py-4 bg-red-600 rounded-full font-bold text-white transition shadow-lg shadow-red-600/20 w-[300px] justify-center
+            ${isAnimating ? 'opacity-80 cursor-wait' : 'hover:bg-red-700 hover:scale-105'}`}
+        >
+          <RefreshCw className={`w-5 h-5 transition-transform duration-1000 ${isAnimating ? 'animate-spin' : (step === 3 ? 'rotate-180' : '')}`} />
+          {btnText}
+        </button>
+      </div>
+
+      <div className="relative min-h-[500px] pro-card rounded-3xl p-8 transition-all duration-700 bg-slate-50 flex flex-col items-center justify-center overflow-hidden">
+        
+        {/* Title for State 0/1 */}
+        <div className={`absolute top-8 transition-all duration-500 ${step >= 2 ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}>
+           <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+             <XCircle className="w-5 h-5 text-red-500"/> One Giant Table (Data Duplication!)
+           </h3>
+        </div>
+
+        {/* Title for State 3 */}
+        <div className={`absolute top-8 transition-all duration-500 ${step === 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+           <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+             <CheckCircle2 className="w-5 h-5 text-emerald-500"/> Normalized Tables (Efficient, Scalable)
+           </h3>
+        </div>
+
+        {/* --- ANIMATION CONTAINER (Steps 0, 1, 2) --- */}
+        <div className={`absolute transition-all duration-700 flex justify-center items-center z-10 w-full max-w-4xl
+          ${step === 3 ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}
+          ${step >= 2 ? 'gap-12' : 'gap-0'}
+        `}>
+          
+          {/* GROUP 1: ORDERS (Left originally, moves Top Center) */}
+          <div className={`transition-all duration-700 ease-in-out bg-white relative z-20
+            ${step >= 2 
+              ? 'rounded-xl shadow-xl border border-purple-300 translate-y-[-70px] translate-x-[160px] scale-110' 
+              : 'border-y border-l border-rose-200 rounded-l-xl'}
+          `}>
+             {step >= 2 && <div className="absolute -top-8 left-0 right-0 text-center font-bold text-purple-600 text-sm animate-in fade-in">Extracting Orders...</div>}
+             <table className="text-sm text-center w-[120px] border-collapse">
+                <thead className={`transition-colors duration-500 ${step > 0 ? 'bg-purple-100 text-purple-900' : 'bg-rose-50 text-rose-800 border-b border-rose-200'}`}>
+                  <tr><th className="p-3 font-semibold">OrderID</th></tr>
+                </thead>
+                <tbody className="text-slate-700">
+                  <tr className={`transition-colors duration-500 border-b ${step > 0 ? 'border-purple-100 bg-purple-50/40' : 'border-rose-100'}`}><td className="p-3 h-12">1</td></tr>
+                  <tr className={`transition-colors duration-500 border-b ${step > 0 ? 'border-purple-100 bg-purple-50/40' : 'border-rose-100 bg-rose-50/50'}`}><td className="p-3 h-12">2</td></tr>
+                  <tr className={`transition-colors duration-500 ${step > 0 ? 'bg-purple-50/40' : ''}`}><td className="p-3 h-12">3</td></tr>
+                </tbody>
+             </table>
+          </div>
+
+          {/* GROUP 2: CUSTOMERS (Mid originally, moves Bottom Left) */}
+          <div className={`transition-all duration-700 ease-in-out bg-white relative z-30
+            ${step >= 2 
+              ? 'rounded-xl shadow-xl border border-blue-300 translate-y-[60px] translate-x-[-120px] scale-110' 
+              : 'border-y border-l border-rose-200'}
+          `}>
+             {step >= 2 && <div className="absolute -top-8 left-0 right-0 text-center font-bold text-blue-600 text-sm animate-in fade-in">Extracting Customers...</div>}
+             <table className="text-sm text-center w-[200px] border-collapse">
+                <thead className={`transition-colors duration-500 ${step > 0 ? 'bg-blue-100 text-blue-900' : 'bg-rose-50 text-rose-800 border-b border-rose-200'}`}>
+                  <tr><th className="p-3 font-semibold">Customer</th><th className="p-3 font-semibold">Address</th></tr>
+                </thead>
+                <tbody className="text-slate-700">
+                  <tr className={`transition-colors duration-500 border-b ${step > 0 ? 'border-blue-100 bg-blue-50/40' : 'border-rose-100'}`}><td className="p-3 h-12">Alice</td><td className="p-3 h-12">NY</td></tr>
+                  <tr className={`transition-colors duration-500 border-b ${step > 0 ? 'border-blue-100 bg-blue-50/40 text-blue-900' : 'border-rose-100 bg-rose-50/50 text-rose-600 font-bold'}`}><td className="p-3 h-12">Alice</td><td className="p-3 h-12">NY</td></tr>
+                  <tr className={`transition-colors duration-500 ${step > 0 ? 'bg-blue-50/40' : ''}`}><td className="p-3 h-12">Bob</td><td className="p-3 h-12">LA</td></tr>
+                </tbody>
+             </table>
+          </div>
+
+          {/* GROUP 3: PRODUCTS (Right originally, moves Bottom Right) */}
+          <div className={`transition-all duration-700 ease-in-out bg-white relative z-10
+            ${step >= 2 
+              ? 'rounded-xl shadow-xl border border-emerald-300 translate-y-[60px] translate-x-[20px] scale-110' 
+              : 'border border-rose-200 rounded-r-xl'}
+          `}>
+             {step >= 2 && <div className="absolute -top-8 left-0 right-0 text-center font-bold text-emerald-600 text-sm animate-in fade-in">Extracting Products...</div>}
+             <table className="text-sm text-center w-[200px] border-collapse">
+                <thead className={`transition-colors duration-500 ${step > 0 ? 'bg-emerald-100 text-emerald-900' : 'bg-rose-50 text-rose-800 border-b border-rose-200'}`}>
+                  <tr><th className="p-3 font-semibold">Product</th><th className="p-3 font-semibold">Price</th></tr>
+                </thead>
+                <tbody className="text-slate-700">
+                  <tr className={`transition-colors duration-500 border-b ${step > 0 ? 'border-emerald-100 bg-emerald-50/40' : 'border-rose-100'}`}><td className="p-3 h-12">Laptop</td><td className="p-3 h-12">$999</td></tr>
+                  <tr className={`transition-colors duration-500 border-b ${step > 0 ? 'border-emerald-100 bg-emerald-50/40' : 'border-rose-100 bg-rose-50/50'}`}><td className="p-3 h-12">Mouse</td><td className="p-3 h-12">$25</td></tr>
+                  <tr className={`transition-colors duration-500 ${step > 0 ? 'bg-emerald-50/40 text-emerald-900' : 'text-rose-600 font-bold'}`}><td className="p-3 h-12">Laptop</td><td className="p-3 h-12">$999</td></tr>
+                </tbody>
+             </table>
+          </div>
+
+        </div>
+
+        {/* --- FINAL NORMALIZED CONTAINER (Step 3) --- */}
+        <div className={`absolute w-full max-w-4xl transition-all duration-1000 flex flex-col items-center justify-center gap-8
+          ${step === 3 ? 'opacity-100 scale-100 pointer-events-auto z-20' : 'opacity-0 scale-105 pointer-events-none z-0'}
+        `}>
+           {/* Row 1: Orders */}
+           <div className="w-[380px]">
+             <NormTable title="Orders" headers={['OrderID', 'CustID (FK)', 'ProdID (FK)']} data={[['1', '1', 'P1'], ['2', '1', 'P2'], ['3', '2', 'P1']]} color="purple" />
+           </div>
+           
+           {/* Row 2: Customers & Products */}
+           <div className="flex justify-center gap-12 w-full">
+              <div className="w-[320px]">
+                <NormTable title="Customers" headers={['CustID', 'Name', 'Address']} data={[['1', 'Alice', 'NY'], ['2', 'Bob', 'LA']]} color="blue" />
+              </div>
+              <div className="w-[320px]">
+                <NormTable title="Products" headers={['ProdID', 'Product', 'Price']} data={[['P1', 'Laptop', '$999'], ['P2', 'Mouse', '$25']]} color="emerald" />
+              </div>
+           </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+const NormTable = ({ title, headers, data, color }) => {
+  const colorMap = {
+    purple: 'border-purple-200 shadow-purple-500/10',
+    blue: 'border-blue-200 shadow-blue-500/10',
+    emerald: 'border-emerald-200 shadow-emerald-500/10',
+  };
+  const headerMap = {
+    purple: 'bg-purple-50 text-purple-900 border-purple-200',
+    blue: 'bg-blue-50 text-blue-900 border-blue-200',
+    emerald: 'bg-emerald-50 text-emerald-900 border-emerald-200',
+  };
+
+  return (
+    <div className={`border rounded-xl overflow-hidden shadow-lg bg-white ${colorMap[color]}`}>
+      <div className={`p-3 font-bold text-center border-b ${headerMap[color]}`}>{title}</div>
+      <table className="w-full text-xs text-center">
+        <thead className="bg-white border-b border-slate-100 text-slate-600">
+          <tr>{headers.map(h => <th key={h} className="p-2 font-semibold">{h}</th>)}</tr>
+        </thead>
+        <tbody className="text-slate-700 bg-white">
+          {data.map((row, i) => (
+            <tr key={i} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+              {row.map((cell, j) => (
+                <td key={j} className="p-3">
+                  {/* Highlight FKs slightly */}
+                  {j > 0 && title === 'Orders' ? <span className="bg-slate-100 px-2 py-1 rounded text-slate-600 font-mono text-[10px]">{cell}</span> : cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+// 7. Indexing & Query Optimization
+const Indexing = () => {
+  const [hasIndex, setHasIndex] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [activeBlock, setActiveBlock] = useState(null);
+  const target = 7;
+  const blocks = [2, 5, 1, 9, 7, 4, 8];
+
+  const handleSearch = () => {
+    if (searching) return;
+    setSearching(true);
+    setActiveBlock(null);
+
+    if (!hasIndex) {
+      // Full table scan
+      let current = 0;
+      const interval = setInterval(() => {
+        setActiveBlock(current);
+        if (blocks[current] === target) {
+          clearInterval(interval);
+          setTimeout(() => setSearching(false), 1000);
+        } else {
+          current++;
+        }
+      }, 500);
+    } else {
+      // Indexed jump (simulated O(1) or O(log n))
+      setTimeout(() => {
+        setActiveBlock(blocks.indexOf(target));
+        setTimeout(() => setSearching(false), 1000);
+      }, 300);
+    }
+  };
+
+  return (
+    <div className="space-y-12">
+      <SectionHeading title="Indexing" subtitle="How databases find data lightning fast." icon={Search} />
+      
+      <div className="pro-card rounded-3xl p-8 bg-slate-50">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+          <div className="flex items-center gap-4">
+            <span className="text-slate-700 font-semibold">Search Mode:</span>
+            <div className="flex bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
+              <button 
+                onClick={() => setHasIndex(false)}
+                className={`px-4 py-2 rounded-md transition font-semibold ${!hasIndex ? 'bg-slate-100 text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >Full Scan (No Index)</button>
+              <button 
+                onClick={() => setHasIndex(true)}
+                className={`px-4 py-2 rounded-md transition font-semibold ${hasIndex ? 'bg-slate-100 text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >B-Tree Index</button>
+            </div>
+          </div>
+          
+          <button 
+            onClick={handleSearch} disabled={searching}
+            className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-600/20 rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Search className="w-5 h-5"/> Find ID: 7
+          </button>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-4">
+          {blocks.map((val, idx) => (
+            <div 
+              key={idx}
+              className={`w-16 h-16 rounded-xl flex items-center justify-center text-xl font-mono font-bold transition-all duration-300 shadow-sm
+                ${activeBlock === idx 
+                  ? val === target ? 'bg-emerald-500 text-white scale-110 shadow-lg shadow-emerald-500/30' : 'bg-rose-500 text-white scale-110'
+                  : 'bg-white text-slate-700 border border-slate-200'}`}
+            >
+              {val}
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-8 text-center font-mono text-sm h-6 font-semibold">
+          {searching && !hasIndex && <span className="text-slate-600">Scanning row by row... O(N) complexity</span>}
+          {searching && hasIndex && <span className="text-emerald-600">Index pointer used! Jumped directly. O(log N) complexity</span>}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 8 & 9. ER Diagram & Instagram Case Study
+const InstagramCaseStudy = () => {
+  const [activeNode, setActiveNode] = useState('users');
+
+  const schema = {
+    users: { icon: Users, label: 'Users', connections: ['posts', 'comments', 'follows', 'likes'], sql: 'CREATE TABLE Users (\n  id UUID PK,\n  username VARCHAR UNIQUE\n);' },
+    posts: { icon: Layout, label: 'Posts', connections: ['users', 'comments', 'likes'], sql: 'CREATE TABLE Posts (\n  id UUID PK,\n  user_id UUID FK,\n  image_url VARCHAR\n);' },
+    comments: { icon: MessageSquare, label: 'Comments', connections: ['users', 'posts'], sql: 'CREATE TABLE Comments (\n  id UUID PK,\n  post_id UUID FK,\n  user_id UUID FK\n);' },
+    follows: { icon: Users, label: 'Follows', connections: ['users'], sql: 'CREATE TABLE Follows (\n  follower_id UUID FK,\n  following_id UUID FK,\n  PRIMARY KEY (follower_id, following_id)\n);' },
+    likes: { icon: Heart, label: 'Likes', connections: ['users', 'posts'], sql: 'CREATE TABLE Likes (\n  user_id UUID FK,\n  post_id UUID FK,\n  PRIMARY KEY (user_id, post_id)\n);' },
+  };
+
+  const isConnected = (node) => activeNode === node || schema[activeNode].connections.includes(node);
+
+  return (
+    <div className="space-y-12">
+      <SectionHeading title="Real-World ER Diagram" subtitle="Designing the database schema for Instagram." icon={Share2} />
+      
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Interactive Graph */}
+        <div className="lg:col-span-8 pro-card rounded-3xl p-12 min-h-[500px] flex items-center justify-center relative bg-slate-50">
+          <div className="relative w-full max-w-md aspect-square flex items-center justify-center">
+            {/* Center Node */}
+            <div className="absolute z-10">
+              <DiagramNode 
+                id="users" data={schema.users} active={activeNode === 'users'} highlight={isConnected('users')} 
+                onClick={() => setActiveNode('users')} 
+              />
+            </div>
+            
+            {/* Satellite Nodes */}
+            {['posts', 'comments', 'follows', 'likes'].map((key, index) => {
+              const angle = (index * (360 / 4)) * (Math.PI / 180);
+              const radius = 160;
+              const x = Math.cos(angle) * radius;
+              const y = Math.sin(angle) * radius;
+              
+              return (
+                <div key={key} className="absolute" style={{ transform: `translate(${x}px, ${y}px)` }}>
+                  <DiagramNode 
+                    id={key} data={schema[key]} active={activeNode === key} highlight={isConnected(key)} 
+                    onClick={() => setActiveNode(key)} 
+                  />
+                </div>
+              );
+            })}
+            
+            {/* Center connecting lines mockup */}
+            <div className="absolute inset-0 border-2 border-dashed border-slate-300 rounded-full animate-[spin_90s_linear_infinite] pointer-events-none" />
+          </div>
+        </div>
+
+        {/* SQL Snippet View */}
+        <div className="lg:col-span-4 pro-card rounded-3xl p-6 space-y-6">
+          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <Code className="text-red-600 w-6 h-6" />
+            <h3 className="text-xl font-bold text-slate-900">Schema Definition</h3>
+          </div>
+          <div className="bg-slate-900 p-5 rounded-xl shadow-inner overflow-x-auto">
+            <pre className="text-sm font-mono text-red-300 whitespace-pre-wrap">
+              {schema[activeNode].sql}
+            </pre>
+          </div>
+          <p className="text-slate-500 text-sm font-medium">
+            Click on nodes in the graph to view their DDL and relationships.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DiagramNode = ({ data, active, highlight, onClick }) => {
+  const Icon = data.icon;
+  return (
+    <button 
+      onClick={onClick}
+      className={`relative group flex flex-col items-center justify-center w-24 h-24 rounded-2xl transition-all duration-300 shadow-sm
+        ${active ? 'bg-red-600 shadow-lg shadow-red-600/30 scale-110 z-20 border-transparent text-white' : 
+          highlight ? 'bg-white border-2 border-red-300 text-red-600 shadow-md' : 
+          'bg-white border border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300'}`}
+    >
+      <Icon className="w-8 h-8 mb-2" />
+      <span className="text-xs font-bold">{data.label}</span>
+    </button>
+  );
+};
+
+// 10. Query Optimization
+const OptimizationTips = () => (
+  <div className="space-y-12">
+    <SectionHeading title="Query Optimization" subtitle="Writing queries that don't crash the server." icon={Cpu} />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <OptCard 
+        good="SELECT id, name FROM users" 
+        bad="SELECT * FROM users" 
+        tip="Avoid SELECT * to reduce memory and network overhead."
+      />
+      <OptCard 
+        good="WHERE status = 'active' LIMIT 10" 
+        bad="Fetch all in code, then filter" 
+        tip="Filter early in the database using WHERE."
+      />
+      <OptCard 
+        good="INNER JOIN orders ON u.id = o.user_id" 
+        bad="WHERE u.id IN (SELECT user_id...)" 
+        tip="Prefer JOINs over subqueries for better execution plans."
+      />
+      <OptCard 
+        good="CREATE INDEX idx_status ON users(status)" 
+        bad="No indexes on frequently filtered columns" 
+        tip="Use indexes on columns used in WHERE, JOIN, and ORDER BY."
+      />
+    </div>
+  </div>
+);
+
+const OptCard = ({ good, bad, tip }) => (
+  <div className="pro-card p-6 rounded-2xl space-y-4">
+    <p className="text-slate-800 font-bold mb-2">{tip}</p>
+    <div className="space-y-2 font-mono text-sm">
+      <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 flex items-start gap-2 shadow-sm">
+        <XCircle className="w-4 h-4 mt-0.5 shrink-0 text-rose-500" />
+        <span className="break-all font-semibold">{bad}</span>
+      </div>
+      <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 flex items-start gap-2 shadow-sm">
+        <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-emerald-600" />
+        <span className="break-all font-semibold">{good}</span>
+      </div>
+    </div>
+  </div>
+);
+
+// 11. Database Admin
+const DBAdmin = () => (
+  <div className="space-y-12">
+    <SectionHeading title="Database Administration" subtitle="Keeping the engine running smoothly." icon={Settings} />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <AdminCard icon={DatabaseBackup} title="Backup & Recovery" desc="Point-in-time recovery and automated snapshots." />
+      <AdminCard icon={Lock} title="Security & Roles" desc="Principle of least privilege and encryption at rest." />
+      <AdminCard icon={Gauge} title="Performance Tuning" desc="Analyzing slow query logs and resource usage." />
+      <AdminCard icon={Activity} title="Monitoring" desc="Real-time alerts for CPU, memory, and deadlocks." />
+    </div>
+  </div>
+);
+
+const AdminCard = ({ icon: Icon, title, desc }) => {
+  return (
+    <div className="pro-card p-6 rounded-3xl flex flex-col items-start hover:-translate-y-2 transition-transform duration-300">
+      <div className="p-4 rounded-2xl border mb-4 bg-red-50 border-red-100 text-red-600">
+        <Icon className="w-8 h-8" />
+      </div>
+      <h4 className="text-xl font-bold text-slate-900 mb-2">{title}</h4>
+      <p className="text-slate-500 text-sm leading-relaxed font-medium">{desc}</p>
+    </div>
+  );
+};
+
+// 13. Interactive Quiz
+const Quiz = () => {
+  const [q, setQ] = useState(0);
+  const [selected, setSelected] = useState(null);
+  
+  const questions = [
+    { text: "Which command is used to add a new column to an existing table?", opts: ["UPDATE", "INSERT", "ALTER", "MODIFY"], ans: 2 },
+    { text: "What constraint ensures referential integrity between two tables?", opts: ["PRIMARY KEY", "FOREIGN KEY", "UNIQUE", "CHECK"], ans: 1 },
+    { text: "Normalization primarily helps to reduce...", opts: ["Query speed", "Data redundancy", "Indexes", "Security"], ans: 1 }
+  ];
+
+  const handleSelect = (idx) => {
+    setSelected(idx);
+    setTimeout(() => {
+      setSelected(null);
+      setQ((prev) => (prev + 1) % questions.length);
+    }, 1500);
+  };
+
+  return (
+    <div className="space-y-12">
+      <SectionHeading title="Knowledge Check" subtitle="Test your database design skills." icon={Play} />
+      <div className="max-w-2xl mx-auto pro-card p-8 rounded-3xl text-center">
+        <div className="text-sm font-bold text-red-600 mb-4 tracking-widest uppercase">Question {q + 1} of {questions.length}</div>
+        <h3 className="text-2xl font-bold text-slate-900 mb-8">{questions[q].text}</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {questions[q].opts.map((opt, idx) => {
+            let stateClass = "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-red-300 shadow-sm";
+            if (selected !== null) {
+              if (idx === questions[q].ans) stateClass = "bg-emerald-600 text-white border-emerald-600 shadow-md";
+              else if (idx === selected) stateClass = "bg-red-600 text-white border-red-600 shadow-md";
+              else stateClass = "opacity-50 bg-slate-50 border-slate-200 text-slate-400";
+            }
+            return (
+              <button 
+                key={idx} 
+                onClick={() => selected === null && handleSelect(idx)}
+                className={`p-4 rounded-xl font-bold transition-all border ${stateClass}`}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 14. Summary Dashboard
+const Summary = () => (
+  <div className="relative py-20 mt-20 border-t border-slate-200 bg-white">
+    <div className="relative z-10 text-center space-y-8">
+      <div className="inline-block p-5 bg-gradient-to-br from-red-500 to-red-700 rounded-3xl mb-4 shadow-lg shadow-red-600/30">
+        <Database className="w-12 h-12 text-white" />
+      </div>
+      <h2 className="text-5xl font-black text-slate-900">The Database Mindset</h2>
+      <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+        Great schema design is a balance of <span className="font-bold text-red-600">Integrity</span>, <span className="font-bold text-red-600">Scalability</span>, and <span className="font-bold text-red-600">Performance</span>.
+      </p>
+    </div>
+  </div>
+);
+
+// Main App Container
+export default function App() {
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-red-200 overflow-x-hidden">
+      <style>{globalStyles}</style>
+      
+      {/* Background Grid */}
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+      
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-40">
+        <HeroSection />
+        <DBMSIntro />
+        <RelationalModel />
+        <ConstraintsPlayground />
+        <DDLDMLArena />
+        <Normalization />
+        <Indexing />
+        <InstagramCaseStudy />
+        <OptimizationTips />
+        <DBAdmin />
+        <Quiz />
+        <Summary />
+      </main>
+    </div>
+  );
+}
